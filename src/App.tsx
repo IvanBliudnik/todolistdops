@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import {Todolist} from './Todolist';
 import {v1} from 'uuid';
+import {Button} from "./Button";
 
 
 type ObjectType = {
@@ -138,6 +139,20 @@ function App() {
             ]
         }
     ])
+    const removeAllTodolists = () => {
+        setTodo([])
+    }
+
+    const removeAllTasksInOneTodo = (todolistId: number) => {
+        setTodo(prevState => prevState.map((t, index) => index === todolistId
+            ? {...t, tasks: []}
+            : t
+        ))
+    }
+
+    function removeTodolist(todolistId: number) {
+        setTodo(todo.filter((el, index) => index !== todolistId))
+    }
 
     function removeTask(taskId: string, todolistId: number) {
         setTodo(todo.map((el, index) => index === todolistId ? {
@@ -163,25 +178,10 @@ function App() {
     }
 
 
-    function removeTodolist(todolistId: number) {
-        setTodo(todo.filter((el, index) => index !== todolistId))
-    }
-
-    const removeAllTodolists = () => {
-    //todo: САМОСТОЯТЕЛЬНО
-    }
-
-    const removeAllTasksInOneTodo = (todolistId: number) => {
-        setTodo(prevState => prevState.map((t, index) => index === todolistId
-            ? {...t, tasks: []}
-            : t
-        ))
-    }
-
     return (
         <div className="App">
             <div>
-
+                <Button title={"Remove All"} onClick={removeAllTodolists}/>
             </div>
 
             {
@@ -208,7 +208,8 @@ function App() {
                         changeTaskStatus={changeStatus}
                         filter={tl.filter}
                         removeTodolist={removeTodolist}
-
+                        removeAllTasksInOneTodo={removeAllTasksInOneTodo}
+                        removeAllTodolists = {removeAllTodolists}
                     />
                 })
             }

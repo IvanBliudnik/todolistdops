@@ -14,6 +14,8 @@ type PropsType = {
     addTask: (title: string, todolistId: number) => void
     changeTaskStatus: (id: string, isDone: boolean, todolistId: number) => void
     removeTodolist: (id: number) => void
+    removeAllTasksInOneTodo: (todolistId: number) => void
+    removeAllTodolists: () => void
     filter: FilterValuesType
   }
 
@@ -36,19 +38,43 @@ export function Todolist(props: PropsType) {
     }
     const addTaskHandler = () => {
         props.addTask(title, props.id)
+        setTitle(" ")
     }
     const removeTaskHandler = (taskId: string) => {
         props.removeTask(taskId, props.id)
-    //     мы получаем t.taskId снизу
+        //     мы получаем t.taskId снизу
     }
     const changeFilterHandler = (value: FilterValuesType) => {
         props.changeFilter(value, props.id)
     }
+    const removeAllTasksInOneTodoHandler = () => {
+        props.removeAllTasksInOneTodo(props.id)
+    }
 
+    const mappedTasks = (
+        <ul>
+        {
+            props.tasks.map(t => {
+                const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+                    let newIsDoneValue = e.currentTarget.checked;
+                    props.changeTaskStatus(t.taskId, newIsDoneValue, props.id);
+                }
+                return <li key={t.taskId} className={t.isDone ? "is-done" : ""}>
+                    <input type="checkbox" onChange={onChangeHandler} checked={t.isDone}/>
+                    <span>{t.title}</span>
+                    {/*<button onClick={() => {'removeTask'}}>x</button>*/}
+                    <Button title={"X"} onClick={() => {
+                        removeTaskHandler(t.taskId)
+                    }}/>
+                    {/*передаём вверх t.taskId полученный с map вверх в функцию removeTaskHandler*/}
+                </li>
+            })
+        }
+    </ul>
+    )
     return <div>
         <h3> {props.title}
             <Button title={"X"} onClick={removeTodolistHandler}/>
-
         </h3>
         <div>
             <input value={title}
@@ -58,45 +84,26 @@ export function Todolist(props: PropsType) {
             />
             <Button title={"+"} onClick={addTaskHandler}/>
             {error && <div className="error-message">{error}</div>}
-
         </div>
-      
-        <ul>
-            {
-                props.tasks.map(t => {
-                    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-                        let newIsDoneValue = e.currentTarget.checked;
-                        props.changeTaskStatus(t.taskId, newIsDoneValue, props.id);
-                    }
 
-                    return <li key={t.taskId} className={t.isDone ? "is-done" : ""}>
-                        <input type="checkbox" onChange={onChangeHandler} checked={t.isDone}/>
-                        <span>{t.title}</span>
-                        {/*<button onClick={() => {'removeTask'}}>x</button>*/}
-                        <Button title={"X"} onClick={() => {removeTaskHandler(t.taskId)}}/>
-                        {/*передаём вверх t.taskId полученный с map вверх в функцию removeTaskHandler*/}
-                    </li>
-                })
-            }
-        </ul>
+        <div>
+            <Button title={"removeAllTasksInOneTodo"} onClick={removeAllTasksInOneTodoHandler}/>
+        </div>
+        <div>{mappedTasks}</div>
         <div>
             {/*<button className={props.filter === 'all' ? "active-filter" : ""}*/}
             {/*        onClick={()=>{}}>All*/}
             {/*</button>*/}
-            <Button title={"All"} onClick= {() => changeFilterHandler("all")}/>
-
-
+            <Button title={"All"} onClick={() => changeFilterHandler("all")}/>
             {/*<button className={props.filter === 'active' ? "active-filter" : ""}*/}
             {/*        onClick={()=>{}}>Active*/}
             {/*</button>*/}
             <Button title={"Active"} onClick={() => changeFilterHandler("active")}/>
-
             {/*<button className={props.filter === 'completed' ? "active-filter" : ""}*/}
             {/*        onClick={()=>{}}>Completed*/}
             {/*</button>*/}
             <Button title={"Completed"} onClick={() => changeFilterHandler("completed")}/>
         </div>
-        <p></p>
         {
             props.students.map((el) => {
                 return (
